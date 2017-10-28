@@ -1,0 +1,21 @@
+{% extends 'bootstrap/base.html' %}
+{% import 'bootstrap/wtf.html' as wtf%}
+{% block head %}
+{{ super() }}
+<script>
+    function delete_message(){
+        document.getElementById('pass_message').innerHTML=''
+
+    }
+    setTimeout('delete_message()',2000)
+</script>
+{% endblock %}
+{% block title %}
+登录验证
+{% endblock %}
+{% block content %}
+<div class="container">
+    <p style="color:red;" id="pass_message">{{pass_message}}</p>
+<h1>验证你是否为南昌大学学生</h1>
+    {{wtf.quick_form(form)}}</div>
+{% endblock %}

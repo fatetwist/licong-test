@@ -1,0 +1,39 @@
+{% extends 'bootstrap/base.html' %}
+{% block title %}
+搜索结果
+{% endblock %}
+{% block head %}
+{{ super() }}
+<script>
+    function comment_start(){
+
+    }
+</script>
+{% endblock %}
+{% block content %}
+<table border="1">
+    <tr>
+        <th>
+            序号
+        </th>
+        <th>
+            书名
+        </th>
+
+    </tr>
+{% for x in result %}
+<tr>
+    <td>
+        {{ x['xh'] }}
+    </td>
+    <td>
+        {{ x['book_name'] }}
+    </td>
+    <td>
+        <button onclick=""><a href="comment.html">点击评论</a></button>
+    </td>
+</tr>
+
+{% endfor %}
+</table>
+{% endblock %}

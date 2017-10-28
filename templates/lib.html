@@ -1,0 +1,9 @@
+{% extends 'bootstrap/base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block title %}
+图书检索系统
+{% endblock %}
+{% block content %}
+<h1>欢迎你，来自{{ my_info['department'] }}的{{my_info['name']}}同学！</h1>
+{{wtf.quick_form(form)}}
+{% endblock%}
