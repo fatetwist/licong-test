@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block title %}
+My message board
+{% endblock %}
+{% block head %}
+{{super()}}
+<style type="text/css">
+.mboard_content {
+	color: red;
+	font-size: 20px;
+}
+</style>
+{% endblock %}
+
+
+
+{% block content %}
+<div class="container">
+{{ wtf.quick_form(subform) }}
+</div>
+<div class="container">
+{% for x in num_list %}
+<hr>
+
+<div>
+{{ message[x][1] }}
+</div>
+<div class="mboard_content">
+{{message[x][2]}}		
+</div>
+
+{% endfor %}
+</div>
+{% endblock %}
