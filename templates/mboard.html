@@ -21,16 +21,19 @@ My message board
 {{ wtf.quick_form(subform) }}
 </div>
 <div class="container">
+
 {% for x in num_list %}
 <hr>
 
 <div>
-{{ message[x][1] }}
+{{ name }}    {{ message[x][1] }}
 </div>
 <div class="mboard_content">
-{{message[x][2]}}		
+{{message[x][2]}}
 </div>
-
+    <button style="float: right;margin-top: -15px;"><a href="mboard.html" style="text-decoration: None;">删除此条</a></button>
 {% endfor %}
+
+
 </div>
 {% endblock %}
