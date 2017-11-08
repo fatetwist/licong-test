@@ -5,8 +5,11 @@ from flask_wtf import Form
 from wtforms import TextAreaField,SubmitField,PasswordField
 from wtforms.validators import Required
 import sqlite3
+from flask_script import Manager
+
 
 app = Flask(__name__)
+manager = Manager(app)
 bootstrap = Bootstrap(app)
 app.config['SECRET_KEY']='GUOKAOHE'
 class newform(Form):
@@ -154,5 +157,8 @@ def deleteMessage(message_id):
     cu.execute('delete from catalog where id=%s' % message_id)
     return redirect(url_for('mboard'))
 
+def s():
+    print("hahahaha")
+manager.add_command("ys",s())
 if __name__ == '__main__':
-    app.run()
+    manager.run()
