@@ -1,4 +1,4 @@
-# coding = utf-8
+# coding=utf-8
 from flask import Flask,render_template,session,redirect,url_for
 from flask_bootstrap import Bootstrap
 # form
