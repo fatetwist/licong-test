@@ -1,3 +1,4 @@
+# coding = utf-8
 from flask import Flask,render_template,session,redirect,url_for
 from flask_bootstrap import Bootstrap
 # form
@@ -121,8 +122,11 @@ def mboard():
         name  = session.get('name')
 # get num,mboard
         cu.execute('select * from catalog')
-        num = cu.fetchall()[-1][0] +1
-
+        num = cu.fetchall()
+        if num:
+            num = num[-1][0]+1
+        else:
+            num = 1
         mboard = subform.content.data
 # get time
         time_now = get_time()
