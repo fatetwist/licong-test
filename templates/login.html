@@ -8,7 +8,9 @@
 {% block content %}
 <div class="container">
 <p style="color:red;font-size:20">
+{% if error != None %}
     {{ error }}
+{% endif %}
 </p>
 {{ wtf.quick_form(form_login) }}
 </div>

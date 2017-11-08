@@ -17,7 +17,7 @@ class newform(Form):
     content = TextAreaField('please enter you message:',validators=[Required()],  render_kw={'placeholder':'Message board','style':'background: url("arrow.ico");height:500;'})
     form_submit = SubmitField('Submit')
 class loginform(Form):
-    pwd = PasswordField(u'你真不简单，居然可以找到这！\n ok,Please enter your password')
+    pwd = PasswordField('你真不简单，居然可以找到这！\n ok,Please enter your password')
     form_submit = SubmitField(u'进入留言板')
 
 def get_count(db_cursor,db_table):
@@ -84,7 +84,7 @@ def login():
             return redirect(url_for('mboard'))
         else:
             conn.close()
-            session['message'] = u'密码错误，若你是外来人员请不要反复重试，否则你们的浏览器将会崩溃！'
+            session['message'] = '密码错误，若你是外来人员请不要反复重试，否则你们的浏览器将会崩溃！'
             return redirect(url_for('login'))
 
 
@@ -148,9 +148,10 @@ def mboard():
     conn.close()
     num_list = list(range(num-1,-1,-1))
     name = session.get('name')
+    print
 
 
-    return render_template('mboard.html',message=message,subform=subform,num_list =num_list,name=name)
+    return render_template('mboard.html',message=message,subform=subform,num_list =num_list,name=name,num=num)
 
 
 
