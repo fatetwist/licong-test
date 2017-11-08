@@ -11,22 +11,27 @@ My message board
 	color: red;
 	font-size: 20px;
 }
+.mboard_p{
+    color:blue;
+    font-size:18px;
+}
 </style>
 {% endblock %}
 
 
-
 {% block content %}
+<div class="container mboard_p">
+<p>欢迎你，{{ name }}！</p>
+</div>
 <div class="container">
 {{ wtf.quick_form(subform) }}
 </div>
 <div class="container">
-
 {% for x in num_list %}
 <hr>
 
 <div>
-{{ name }}    {{ message[x][1] }}
+{{ message[x][3] }}    {{ message[x][1] }}
 </div>
 <div class="mboard_content">
 {{message[x][2]}}
