@@ -124,9 +124,9 @@ def mboard():
 def deleteMessage(id):
     if islogin() ==True:
         dbcon.delete('catalog',int(id))
-        return '删除成功  '+id
+        return u'删除成功  '+id
     else:
-        return '未认证'
+        return u'未认证'
 
 
 def get_count(db_cursor,db_table):
