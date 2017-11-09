@@ -6,9 +6,10 @@ from flask_wtf import Form
 from wtforms import TextAreaField,SubmitField,PasswordField
 from wtforms.validators import Required
 import sqlite3
+import dbcon
 
-
-
+dbcon.connect('mboard.db')
+file = r'mboard.db'
 app = Flask(__name__)
 
 bootstrap = Bootstrap(app)
@@ -19,6 +20,114 @@ class newform(Form):
 class loginform(Form):
     pwd = PasswordField(u'你真不简单，居然可以找到这！\n ok,Please enter your password')
     form_submit = SubmitField(u'进入留言板')
+
+
+
+
+
+@app.route('/login/',methods=['GET','POST'])
+def login():
+    conn = sqlite3.connect(file)
+    cu = conn.cursor()
+    rcnz = session.get('rcnz')
+    try:
+        cu.execute('select * from users where pwd=\'%s\' ' % rcnz)
+        if len(cu.fetchall()) > 0:
+            conn.close()
+            return redirect(url_for('mboard'))
+    except sqlite3.OperationalError:
+
+        pass
+
+
+
+    form_login = loginform()
+    if form_login.validate_on_submit():
+
+        cu.execute('select * from users where pwd=\'%s\'' % form_login.pwd.data)
+        r = cu.fetchall()
+        if len(r) > 0:
+            conn.close()
+            session['rcnz'] = form_login.pwd.data
+            session['name'] = r[0][0]
+            return redirect(url_for('mboard'))
+        else:
+            conn.close()
+            session['message'] = u'密码错误，若你是外来人员请不要反复尝试，否则你们的浏览器将会崩溃！'
+            return redirect(url_for('login'))
+
+
+    conn.close()
+    form_login = loginform()
+    error = session.get('message')
+    return render_template('login.html',form_login = form_login,error = error)
+
+@app.route('/')
+def index():
+
+    return redirect(url_for('login'))
+
+@app.route('/520',methods=['GET','POST'])
+def mboard():
+    rcnz = session.get('rcnz')
+    subform = newform()
+    conn = sqlite3.connect(file)
+    cu = conn.cursor()
+    try:
+        cu.execute('select * from users where pwd="%s"' % rcnz)
+
+        if len(cu.fetchall()) < 1:
+            conn.close()
+            return redirect(url_for('login'))
+    except sqlite3.OperationalError:
+        return redirect(url_for('login'))
+        pass
+
+
+
+    if subform.validate_on_submit():
+        name  = session.get('name')
+
+        cu.execute('select * from catalog')
+        all = cu.fetchall()
+        if len(all) >0:
+            num = all[-1][0]+1
+        else:
+            num = 1
+        print(num)
+        time_now = get_time()
+        mboard = subform.content.data
+
+
+        cu.execute("insert into catalog values (?,?,?,?)" , (num, time_now, mboard,name))
+        conn.commit()
+
+        cu.execute('select * from catalog')
+        message = cu.fetchall()
+
+        num = len(message)
+        num_list = list(range(num-1,-1,-1))
+        conn.close()
+        return redirect(url_for('mboard'))
+
+    cu.execute('select * from catalog')
+    message = cu.fetchall()
+    num = len(message)
+    conn.close()
+    num_list = list(range(num-1,-1,-1))
+    name = session.get('name')
+
+
+    return render_template('mboard.html',message=message,subform=subform,num_list =num_list,name=name,num=num)
+
+@app.route('/dbdelete/<id>')
+def deleteMessage(id):
+    if islogin() ==True:
+        dbcon.delete('catalog',int(id))
+        return '删除成功  '+id
+    else:
+        return '未认证'
+
 
 def get_count(db_cursor,db_table):
     db_cursor.execute('select * from %s' % db_table)
@@ -51,118 +160,26 @@ def match_rcnz(rcnz,pwds):
         else:
             return False
 
-
-
-file = r'mboard.db'
-
-@app.route('/login/',methods=['GET','POST'])
-def login():
-    conn = sqlite3.connect(file)
-    cu = conn.cursor()
-    rcnz = session.get('rcnz')
-    try:
-        cu.execute('select * from users where pwd=\'%s\' ' % rcnz)
-        if len(cu.fetchall()) > 0:
-            conn.close()
-            return redirect(url_for('mboard'))
-    except sqlite3.OperationalError:
-
-        pass
-
-
-
-    form_login = loginform()
-    if form_login.validate_on_submit():
-
-        cu.execute('select * from users where pwd=\'%s\'' % form_login.pwd.data)
-        r = cu.fetchall()
-        if len(r) > 0:
-            conn.close()
-            session['rcnz'] = form_login.pwd.data
-            print(r)
-            session['name'] = r[0][0]
-            return redirect(url_for('mboard'))
-        else:
-            conn.close()
-            session['message'] = u'密码错误，若你是外来人员请不要反复尝试，否则你们的浏览器将会崩溃！'
-            return redirect(url_for('login'))
-
-
-    conn.close()
-    form_login = loginform()
-    error = session.get('message')
-    return render_template('login.html',form_login = form_login,error = error)
-
-@app.route('/')
-def index():
-
-    return redirect(url_for('login'))
-
-
-
-@app.route('/520',methods=['GET','POST'])
-def mboard():
-    rcnz = session.get('rcnz')
-    subform = newform()
-    conn = sqlite3.connect(file)
-    cu = conn.cursor()
-    try:
-        cu.execute('select * from users where pwd="%s"' % rcnz)
-
-        if len(cu.fetchall()) < 1:
-            conn.close()
-            return redirect(url_for('login'))
-    except sqlite3.OperationalError:
-        return redirect(url_for('login'))
-        pass
-
-
-
-    if subform.validate_on_submit():
-        name  = session.get('name')
-# get num,mboard
-        cu.execute('select * from catalog')
-        num = cu.fetchall()
-        if num:
-            num = num[-1][0]+1
-        else:
-            num = 1
-        mboard = subform.content.data
-# get time
-        time_now = get_time()
-# insert and commit db
-        cu.execute("insert into catalog values (?,?,?,?)", (num, time_now, mboard,name))
-        conn.commit()
-# get message  then  return
-        cu.execute('select * from catalog')
-        message = cu.fetchall()
-
-        num = len(message)
-        num_list = list(range(num-1,-1,-1))
-        conn.close()
-        return redirect(url_for('mboard'))
-
-    cu.execute('select * from catalog')
-    message = cu.fetchall()
-    num = len(message)
-    conn.close()
-    num_list = list(range(num-1,-1,-1))
-    name = session.get('name')
-
-
-    return render_template('mboard.html',message=message,subform=subform,num_list =num_list,name=name,num=num)
-
-
-
-@app.route('/delete/<message_id>')
-def deleteMessage(message_id):
-    conn = sqlite3.connect('mboard.db')
-    cu.conn.cursor()
-    cu.execute('delete from catalog where id=%s' % message_id)
-    return redirect(url_for('mboard'))
-
 def make_shell_context():
     return dict(app=app,db=db)
+def islogin():
+    rcnz = session.get('rcnz')
+    if not rcnz:
+        return False
+
+    cu = dbcon.cu
+    cu.execute('select * from users where pwd=%s' % str(rcnz))
+
+    if len(cu.fetchall()) >0:
+        return True
+    else:
+        return False
+
+
+
+
+
+
 
 if __name__ == '__main__':
     app.run()
