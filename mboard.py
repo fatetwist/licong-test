@@ -1,11 +1,12 @@
 # coding=utf-8
-from flask import Flask,render_template,session,redirect,url_for
+from flask import Flask,render_template,session,redirect,url_for,request
 from flask_bootstrap import Bootstrap
 # form
 from flask_wtf import Form
 from wtforms import TextAreaField,SubmitField,PasswordField
 from wtforms.validators import Required
 import sqlite3
+import json
 import dbcon
 
 dbcon.connect('mboard.db')
@@ -127,6 +128,30 @@ def deleteMessage(id):
         return u'删除成功  '+id
     else:
         return u'未认证'
+@app.route('/Message_sub',methods=['POST','GET'])
+def Message_sub():
+
+    if islogin() == False:
+        print('111')
+        return 'null'
+    subMessage = request.form['submessage']
+    name = request.form['name']
+    if dbcon.submit("catalog",name,subMessage) == True:
+        print('提交成功')
+        return "提交成功！"
+    else:
+        print('提交失败！')
+        return "提交失败！"
+
+
+@app.route('/Message_get')
+def Message_get():
+
+    if islogin()==False:
+        return 'null'
+
+    ms = dbcon.getMessage()
+    return str(ms)
 
 
 def get_count(db_cursor,db_table):

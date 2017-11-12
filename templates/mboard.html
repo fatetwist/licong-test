@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% import 'bootstrap/wtf.html' as wtf %}
 
 <!-- title -->
 {% block title %}
@@ -19,24 +18,48 @@ My message board
 </style>
 
 <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js"></script>
-<script src="/static/mboard.js?v=1.5">
+<script src="/static/mboard.js?v=1.9"></script>
+<script>
+$(document).ready(function(){
+    $('button.button_sub').click(function(){
 
+        let submessage = $('textarea.submessage').val();
+        $.post("/Message_sub",{name:'{{ name }}',submessage:submessage});
+        getMessage();
+        setBtn();
+    });
+
+    setBtn();
+
+
+
+})
 </script>
-
 {% endblock %}
 
 
 
 {% block content %}
+
 <div class="container mboard_p">
 <p>欢迎你，{{ name }}！</p>
 </div>
+
 <div class="container">
-{{ wtf.quick_form(subform) }}
+<textarea name="message" class="submessage"></textarea>
+<button class="button_sub">提交留言</button>
 </div>
-<div class="container">
-<p><b>当前共有 <span style="font-size:20;color: red;" id='num'>{{num}}</span> 条留言</b> <b>  💪加油</b></p>
+
+
+    <div class="container" id="current_num">
+    <p><b>当前共有 <span style="font-size:20;color: red;" id='num'>{{num}}</span> 条留言</b> <b>  💪加油</b></p>
+    </div>
+
+
+<div class="container" id="YES">
+
 {% for x in num_list %}
+
 <div id="{{ message[x][0] }}" class="mboard_div">
 <hr>
 
@@ -47,6 +70,10 @@ My message board
 </div>
     <button style="float: right;margin-top: -15px;" class="button_d" id="{{ message[x][0] }}">删除此条</button>
 </div>
+
+
 {% endfor %}
+
+
 </div>
 {% endblock %}
